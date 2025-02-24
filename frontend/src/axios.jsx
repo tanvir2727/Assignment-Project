@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5000/', // Replace with your backend API base URL
+  baseURL: 'http://localhost:5000', // Replace with your backend API base URL
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,7 +31,7 @@ instance.interceptors.response.use(
 
       try {
         // Send request to backend to refresh the access token using the refresh token from cookies
-        const response = await axios.post('/auth/refresh-token', {}, {
+        const response = await instance.post('/auth/refresh-token', {}, {
           withCredentials: true, // Ensure cookies are sent with the request
         });
 

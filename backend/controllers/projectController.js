@@ -1,23 +1,53 @@
-const db = require('../config/db');
+const db = require('../confige/db');
 
 // 1. Create a new project
 const createProject = async (req, res) => {
     try {
-        const { name, introduction, status, startDateTime, endDateTime } = req.body;
-        const ownerId = req.user.id; // The user creating the project becomes the owner
+        if (!req.user) {
+            return res.status(403).json({ message: 'User not authenticated' });
+        }
+
+        const { name, introduction, status, startDateTime, endDateTime, members } = req.body;
+        const ownerId = req.user.id;
 
         if (!name || !introduction || !status || !startDateTime || !endDateTime) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        const query = 'INSERT INTO projects (name, introduction, status, startDateTime, endDateTime, ownerId) VALUES (?, ?, ?, ?, ?, ?)';
-        await db.query(query, [name, introduction, status, startDateTime, endDateTime, ownerId]);
+        if (!Array.isArray(members) || members.length > 5) {
+            return res.status(400).json({ message: 'You can assign up to 5 members only' });
+        }
 
-        res.status(201).json({ message: 'Project created successfully' });
+        const projectQuery = 'INSERT INTO projects (name, introduction, status, startDateTime, endDateTime, ownerId) VALUES (?, ?, ?, ?, ?, ?)';
+        const [result] = await db.promise().query(projectQuery, [name, introduction, status, startDateTime, endDateTime, ownerId]);
+
+        const projectId = result.insertId;
+
+        if (members.length > 0) {
+            // Validate that all users exist
+            const checkUsersQuery = 'SELECT id FROM users WHERE id IN (?)';
+            const [validUsers] = await db.promise().query(checkUsersQuery, [members]);
+
+            const validUserIds = validUsers.map(user => user.id);
+            const invalidUserIds = members.filter(id => !validUserIds.includes(id));
+
+            if (invalidUserIds.length > 0) {
+                return res.status(400).json({ message: `Users not found: ${invalidUserIds.join(', ')}` });
+            }
+
+            // Insert only valid users
+            const memberQuery = 'INSERT INTO project_members (projectId, userId) VALUES ?';
+            const memberValues = validUserIds.map(userId => [projectId, userId]);
+            await db.promise().query(memberQuery, [memberValues]);
+        }
+
+        res.status(201).json({ message: 'Project created and members assigned successfully' });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 
 
 // 2. Edit project (Only project owner can edit)
@@ -29,7 +59,7 @@ const editProject = async (req, res) => {
 
         // Check if the project exists and the user is the owner
         const projectQuery = 'SELECT * FROM projects WHERE id = ? AND ownerId = ?';
-        const [project] = await db.query(projectQuery, [projectId, ownerId]);
+        const [project] = await db.promise().query(projectQuery, [projectId, ownerId]);
 
         if (project.length === 0) {
             return res.status(403).json({ message: 'You are not authorized to edit this project' });
@@ -53,7 +83,7 @@ const deleteProject = async (req, res) => {
 
         // Check if the project exists and the user is the owner
         const projectQuery = 'SELECT * FROM projects WHERE id = ? AND ownerId = ?';
-        const [project] = await db.query(projectQuery, [projectId, ownerId]);
+        const [project] = await db.promise().query(projectQuery, [projectId, ownerId]);
 
         if (project.length === 0) {
             return res.status(403).json({ message: 'You are not authorized to delete this project' });
@@ -69,28 +99,22 @@ const deleteProject = async (req, res) => {
 };
 
 
-// 4. Assign user to project (Only project owner can assign)
-const assignUserToProject = async (req, res) => {
+const getOwnerProjects = async (req, res) => {
     try {
-        const { projectId, userId } = req.body;
-        const ownerId = req.user.id;
+        const ownerId = req.user.id; // Get user ID from authenticated request
 
-        // Check if the project exists and the user is the owner
-        const projectQuery = 'SELECT * FROM projects WHERE id = ? AND ownerId = ?';
-        const [project] = await db.query(projectQuery, [projectId, ownerId]);
+        const query = 'SELECT * FROM projects WHERE ownerId = ?';
+        const [projects] = await db.promise().query(query, [ownerId]);
 
-        if (project.length === 0) {
-            return res.status(403).json({ message: 'You are not authorized to assign users to this project' });
+        if (projects.length === 0) {
+            return res.status(404).json({ message: 'No projects found' });
         }
 
-        // Add user to the project
-        const assignQuery = 'INSERT INTO project_members (projectId, userId) VALUES (?, ?)';
-        await db.query(assignQuery, [projectId, userId]);
-
-        res.status(200).json({ message: 'User assigned to project successfully' });
+        res.status(200).json(projects);
     } catch (error) {
+        console.error('Error fetching projects:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
 
-module.exports = { createProject, editProject, deleteProject, assignUserToProject };
+module.exports = { createProject, editProject, deleteProject, getOwnerProjects };
