@@ -1,9 +1,13 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes} from 'react-router-dom'
 import './App.css'
 import SignIn from './components/SignIn'
 import SignUp from './components/SignUp'
 import Profile from './components/Profile'
 import CreateProject from './components/CreateProject'
+import Header from './components/Header'
+import AllProjectList from './components/AllProjectList'
+import EditProject from './components/EditProject'
+import Logout from './components/Logout'
 
 
 
@@ -12,15 +16,26 @@ function App() {
 
   return (
     <>
-      
-      <Routes>
-        <Route path='/signin' element={<SignIn />}></Route>
-        <Route path='/signup' element={<SignUp />}></Route>
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/create-project" element={<CreateProject />} />
-        {/* You can add a default route or 404 */}
-        <Route path="*" element={<h2>Page not found</h2>} />
-      </Routes>
+
+
+      <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
+        <Header className="fixed top-0 left-0 w-full bg-white shadow-md z-50" />
+        <main className="container mx-auto p-4">
+          <Routes>
+          <Route path="/" element={<SignIn />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/create-project" element={<CreateProject />} />
+            <Route path='/all-project' element={<AllProjectList/>}/>
+            <Route path="/projects/edit/:projectId" component={<EditProject/>} />
+            <Route path="/logout" element={<Logout />} />
+            {/* You can add a default route or 404 */}
+            <Route path="*" element={<h2 className="text-center text-red-500">Page not found</h2>} />
+          </Routes>
+        </main>
+      </div>
+    
     </>
   )
 }

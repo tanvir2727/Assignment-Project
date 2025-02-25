@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import "./ProfilePage.css"
 import axios from '../axios'; // Your axios instance
 import { useNavigate } from 'react-router-dom';
 import ProjectsList from './ProjectsList';
@@ -7,7 +6,6 @@ import ProjectsList from './ProjectsList';
 
 const Profile = () => {
   const [user, setUser] = useState({});
-  const [message, setMessage] = useState('');
 
   const navigate = useNavigate();
 
@@ -19,7 +17,8 @@ const Profile = () => {
         setUser(response.data);
         console.log(user);
       } catch (error) {
-        setMessage(error.response ? error.response.data.message : 'Error fetching profile');
+         console.log(error);
+         
       }
     };
   
@@ -30,31 +29,46 @@ const Profile = () => {
     navigate('/create-project')
   }
 
+  const handleSeeAllProject =()=>{
+    navigate('/all-project')
+  }
+
   return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <h2>Profile</h2>
-        {message && <p className="message">{message}</p>}
-      </div>
+    <>
+    <div className="min-h-screen  bg-gray-100 flex flex-col items-center">
+      
 
       {user ? (
-        <div className="user-details">
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+        <div className="bg-white p-6 w-full max-w-md rounded-lg shadow-lg text-center mt-4">
+          <p className="text-lg"><strong>Name:</strong> {user.name}</p>
+          <p className="text-lg"><strong>Email:</strong> {user.email}</p>
           {/* Display other user details here */}
         </div>
       ) : (
-        <p className="loading-text">Loading...</p>
+        <p className="text-gray-500 mt-4">Loading...</p>
       )}
 
-      <div className="create-project-section">
-        <button onClick={handleCreateProject} className="create-button">Create Project</button>
+      <div className="mt-6 items-center">
+        <button 
+          onClick={handleCreateProject} 
+          className="bg-blue-600 text-white m-2 py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+        >
+          Create Project
+        </button>
+
+        <button 
+          onClick={handleSeeAllProject} 
+          className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+        >
+          All Project
+        </button>
       </div>
 
-      <div className="projects-list-section">
+      <div className="w-full  mt-6">
         <ProjectsList />
       </div>
     </div>
+    </>
   );
 };
 

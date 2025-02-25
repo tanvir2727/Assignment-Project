@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import "./SignInPage.css"
 import axios from '../axios'; // Import your configured axios instance
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer,toast } from 'react-toastify';
@@ -46,33 +45,38 @@ const SignIn = () => {
 
 
   return (
-    <div className="signin-container">
-    <div className="signin-form">
-      <h2 className="signin-title">Sign In</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="input-field"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="input-field"
-          required
-        />
-        <button type="submit" className="submit-button" onClick={() => toast.success('Signed in successfully!')}>Sign In</button>
-      </form>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Sign In</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+            onClick={() => toast.success('Signed in successfully!')}
+          >
+            Sign In
+          </button>
+        </form>
+        {/* Toast Container for notifications */}
+        <ToastContainer />
+      </div>
     </div>
-
-    {/* Toast Container for notifications */}
-    <ToastContainer />
-  </div>
   );
 };
 

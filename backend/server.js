@@ -13,13 +13,15 @@ const app = express();
 app.use(express.json());
 
 const mysql = require('mysql2/promise');
+app.use(bodyParser.json());
 
 app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:5173',  // Frontend URL
     credentials: true,  // Allow cookies to be sent
   }));
-app.use(bodyParser.json());
+
+
 
 
 app.use('/auth', authRoutes);

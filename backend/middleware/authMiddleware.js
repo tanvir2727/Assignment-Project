@@ -30,7 +30,6 @@ const authenticate = (req, res, next) => {
             if (err) {
                 return res.status(403).json({ message: 'Invalid or expired token.' });
             }
-
             req.user = user;
             next();
         });
@@ -42,16 +41,21 @@ const authenticate = (req, res, next) => {
 
 
 // Refresh token route (using HTTP-only cookies)
-const refreshToken = (req, res) => {
-    const token = req.cookies?.refreshToken; // Get refresh token from cookies
-    if (!token) return res.status(401).json({ message: 'Refresh token required' });
+const refreshToken = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.status(401).json({ message: 'No refresh token provided' });
 
-    jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid refresh token' });
+    try {
+        const decoded = jwt.verify(refreshToken, 'refresh-token-secret');
+        const user = await findUserById(decoded.id);
+        if (!user) return res.status(403).json({ message: 'User not found' });
 
         const newAccessToken = generateAccessToken(user);
-        res.json({ accessToken: newAccessToken });
-    });
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+        res.status(403).json({ message: 'Invalid or expired refresh token' });
+    }
 };
+
 
 module.exports = { authenticate, generateAccessToken, generateRefreshToken, refreshToken};

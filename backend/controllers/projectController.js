@@ -3,6 +3,7 @@ const db = require('../confige/db');
 // 1. Create a new project
 const createProject = async (req, res) => {
     try {
+        
         if (!req.user) {
             return res.status(403).json({ message: 'User not authenticated' });
         }
@@ -66,7 +67,7 @@ const editProject = async (req, res) => {
         }
 
         const updateQuery = 'UPDATE projects SET name = ?, introduction = ?, status = ?, startDateTime = ?, endDateTime = ? WHERE id = ?';
-        await db.query(updateQuery, [name, introduction, status, startDateTime, endDateTime, projectId]);
+        await db.promise().query(updateQuery, [name, introduction, status, startDateTime, endDateTime, projectId]);
 
         res.status(200).json({ message: 'Project updated successfully' });
     } catch (error) {
@@ -90,7 +91,7 @@ const deleteProject = async (req, res) => {
         }
 
         const deleteQuery = 'DELETE FROM projects WHERE id = ?';
-        await db.query(deleteQuery, [projectId]);
+        await db.promise().query(deleteQuery, [projectId]);
 
         res.status(200).json({ message: 'Project deleted successfully' });
     } catch (error) {
@@ -117,4 +118,35 @@ const getOwnerProjects = async (req, res) => {
     }
 };
 
-module.exports = { createProject, editProject, deleteProject, getOwnerProjects };
+const getProjects = async (req, res) => {
+    try {
+        const projectsQuery = `
+            SELECT p.id, p.name, p.introduction, p.status, p.startDateTime, p.endDateTime, p.ownerId, u.name AS ownerName
+            FROM projects p
+            JOIN users u ON p.ownerId = u.id`;
+        
+        const [projects] = await db.promise().query(projectsQuery);
+        
+        for (let project of projects) {
+            const membersQuery = `
+                SELECT u.id, u.name, u.email
+                FROM project_members pm
+                JOIN users u ON pm.userId = u.id
+                WHERE pm.projectId = ?`;
+            
+            const [members] = await db.promise().query(membersQuery, [project.id]);
+            project.members = members;
+        }
+        
+        res.status(200).json({ projects });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+module.exports = { createProject,
+        editProject,
+        deleteProject,
+        getOwnerProjects,
+        getProjects };

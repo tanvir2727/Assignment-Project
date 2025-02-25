@@ -38,7 +38,8 @@ const signin = async (req, res) => {
       res.cookie('refreshToken', refreshToken, {
           httpOnly: true, // Prevents client-side JavaScript access
           secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-          sameSite: 'Strict', // Prevents CSRF attacks
+        //   sameSite: 'Strict', // Prevents CSRF attacks
+          sameSite: "None", // Allows cross-origin requests
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 
@@ -80,5 +81,18 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const logoutUser = (req, res) => {
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        path: '/'
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
+};
 
-module.exports = { signup, signin, getProfile,getAllUsers };
+
+
+
+
+module.exports = { signup, signin, getProfile,getAllUsers,logoutUser };

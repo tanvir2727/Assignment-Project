@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticate } = require('../middleware/authMiddleware');
-const { createProject, editProject, deleteProject, getOwnerProjects } = require('../controllers/projectController');
+const { createProject, editProject, deleteProject, getOwnerProjects, getProjects } = require('../controllers/projectController');
 
 const router = express.Router();
 
@@ -14,5 +14,7 @@ router.put('/projects/:projectId', authenticate, editProject);
 router.delete('/projects/:projectId', authenticate, deleteProject);
 
 router.get('/owner-projects', authenticate, getOwnerProjects);
+
+router.get('/getAllProject',authenticate,getProjects)
 
 module.exports = router;
