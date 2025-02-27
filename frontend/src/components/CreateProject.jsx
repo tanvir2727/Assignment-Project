@@ -32,9 +32,9 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
     fetchUsers();
     if (projectToEdit) {
       setProject({
-        name: "adas",
+        name: projectToEdit.name || '',
         introduction: projectToEdit.introduction || '',
-        status: projectToEdit.status || 'pending',
+        status: projectToEdit.status || '',
         startDateTime: projectToEdit.startDateTime ? projectToEdit.startDateTime.split('.')[0] : '',
         endDateTime: projectToEdit.endDateTime ? projectToEdit.endDateTime.split('.')[0] : ''
       });

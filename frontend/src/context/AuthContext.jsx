@@ -1,38 +1,34 @@
-import React, { createContext, useState, useEffect } from "react";
-import axios from 'axios';
+import { createContext, useContext, useEffect, useState } from "react";
+
 
 const AuthContext = createContext();
 
-// eslint-disable-next-line react/prop-types
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await axios.get('/auth/profile', {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                    },
-                });
-                setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching user', error);
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, [])
 
-        fetchUser();
-    }, []);
+    const login = (token) => {
+        localStorage.setItem("accessToken", token);
+        setIsAuthenticated(true);
+    }
+
+    const logout = () => {
+        localStorage.removeItem("accessToken");
+        setIsAuthenticated(false);
+    }
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
-    );
-};
+    )
+}
 
-export const useAuth = () => React.useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);

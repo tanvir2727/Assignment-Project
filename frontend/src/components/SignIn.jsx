@@ -2,12 +2,14 @@ import { useState } from 'react';
 import axios from '../axios'; // Import your configured axios instance
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
 
 
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuth()
 
 
 
@@ -27,8 +29,13 @@ const SignIn = () => {
         withCredentials: true,
       });
       // Save the access token to localStorage
-      localStorage.setItem('accessToken', response.data.accessToken);
+      // localStorage.setItem('accessToken', response.data.accessToken);
       // setMessage('Login successful!');
+
+      const token = response.data.accessToken;
+
+      login(token);
+
       setEmail('');
       setPassword('');
       navigate('/profile');
@@ -75,7 +82,6 @@ const SignIn = () => {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-            onClick={handleSubmit}
           >
             Sign In
           </button>

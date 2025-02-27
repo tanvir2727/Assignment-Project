@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 
+
 function App() {
 
 
@@ -30,12 +31,13 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-project" element={<CreateProject />} />
             <Route path='/all-project' element={<AllProjectList />} />
-            {/* You can add a default route or 404 */}
             <Route path="*" element={<h2 className="text-center text-red-500">Page not found</h2>} />
           </Routes>
 
         </main>
       </div>
+
+   
 
     </>
   )

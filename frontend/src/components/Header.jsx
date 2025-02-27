@@ -1,17 +1,25 @@
 
+
 import axios from "../axios";
 
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAuth } from "../context/AuthContext";
+
+
 const Header = () => {
+
   const navigate = useNavigate();
 
+  const {isAuthenticated,logout} = useAuth();
+
+  
   const logoutUser = async () => {
     try {
       // Perform logout
       await axios.post("/auth/logout", {}, { withCredentials: true });
-      localStorage.removeItem('accessToken');
-
+      // const token =localStorage.removeItem('accessToken');
+      logout();
       // Show success toast
       toast.success("Logged out successfully!", {
         position: "bottom-right",
@@ -38,19 +46,25 @@ const Header = () => {
       </div>
       <nav>
         <ul className="flex space-x-6">
-          <li>
-            <Link to="/profile" className="nav-link hover:text-gray-300">Profile</Link>
-          </li>
-          <li>
-            <Link to="/signin" className="nav-link hover:text-gray-300">Sign In</Link>
-          </li>
-          <li>
-            <Link to="/signup" className="nav-link hover:text-gray-300">Sign Up</Link>
-          </li>
-          <li>
-            <div className="nav-link hover:text-gray-300 cursor-pointer" onClick={logoutUser}>Log out</div>
-          </li>
-
+          {isAuthenticated ? (
+            <>
+              <li>
+                <Link to="/profile" className="nav-link hover:text-gray-300">Profile</Link>
+              </li>
+              <li>
+                <div className="nav-link hover:text-gray-300 cursor-pointer" onClick={logoutUser}>Log Out</div>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to="/signup" className="nav-link hover:text-gray-300">Sign Up</Link>
+              </li>
+              <li>
+                <Link to="/signin" className="nav-link hover:text-gray-300">Sign In</Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>
