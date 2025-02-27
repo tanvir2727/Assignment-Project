@@ -10,7 +10,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    console.log('Token:', token); // For debugging
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -44,7 +43,9 @@ instance.interceptors.response.use(
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return axios(originalRequest); // Retry the original request
       } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
         // If refresh fails, log out the user or show an error message
+        localStorage.removeItem('accessToken');
         return Promise.reject(refreshError);
       }
     }

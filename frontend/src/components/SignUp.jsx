@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 import axios from "../axios"; // Import your configured axios instance
 
 const SignUp = () => {
@@ -20,16 +22,17 @@ const SignUp = () => {
 
     try {
       // Send POST request to the backend to create the user
-      const response = await axios.post('/signup', { name, email, password });
+      const response = await axios.post('/auth/signup', { name, email, password });
       setMessage('User registered successfully!');
       setName('');
       setEmail('');
       setPassword('');
       console.log(response);
-      
+      toast.success("Sign Up Successfully");
     } catch (error) {
       setMessage(error.response ? error.response.data.message : 'Server error');
     }
+    
     navigate('/signin');
   };
 
@@ -69,7 +72,9 @@ const SignUp = () => {
           Sign Up
         </button>
       </form>
+      
     </div>
+    {/* <ToastContainer /> */}
   </div>
   );
 };

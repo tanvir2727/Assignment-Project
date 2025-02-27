@@ -1,4 +1,8 @@
 const db = require('../confige/db');
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
+const moment = require("moment");
 
 // 1. Create a new project
 const createProject = async (req, res) => {
@@ -145,8 +149,72 @@ const getProjects = async (req, res) => {
     }
 };
 
+
+
+const generatePdf = async (req, res) => {
+    try {
+        // Fetch all projects from the database
+        const [projects] = await db.promise().query(
+            "SELECT p.name, p.introduction, p.status, u.name AS ownerName FROM projects p JOIN users u ON p.ownerId = u.id"
+        );
+
+        if (!projects.length) {
+            return res.status(404).json({ error: "No projects found" });
+        }
+
+        // Ensure the 'reports' directory exists
+        const reportsDir = path.join(__dirname, "../public/reports");
+        if (!fs.existsSync(reportsDir)) {
+            fs.mkdirSync(reportsDir, { recursive: true });
+        }
+
+        // Define file path
+        const filePath = path.join(reportsDir, "all_projects.pdf");
+
+        // Create PDF document
+        const doc = new PDFDocument();
+        const stream = fs.createWriteStream(filePath);
+        doc.pipe(stream);
+
+        // PDF Title
+        doc.fontSize(18).text("Project Report", { align: "center" }).moveDown();
+
+        // Table Headers
+        doc.fontSize(12).text("Project Name", 50, doc.y, { width: 150 });
+        doc.text("Introduction", 200, doc.y, { width: 200 });
+        doc.text("Status", 400, doc.y, { width: 80 });
+        doc.text("Owner", 500, doc.y, { width: 150 });
+        doc.moveDown();
+
+        // Table Content
+        projects.forEach((project) => {
+            doc.fontSize(10).text(project.name, 50, doc.y, { width: 150 });
+            doc.text(project.introduction, 200, doc.y, { width: 200 });
+            doc.text(project.status, 400, doc.y, { width: 80 });
+            doc.text(project.ownerName, 500, doc.y, { width: 150 });
+            doc.moveDown();
+        });
+
+        // Finish PDF
+        doc.end();
+
+        // Wait until the file is fully written before sending response
+        stream.on("close", () => {
+            res.download(filePath);
+        });
+
+    } catch (error) {
+        console.error("PDF Generation Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+
+
 module.exports = { createProject,
         editProject,
         deleteProject,
         getOwnerProjects,
-        getProjects };
+        getProjects,
+        generatePdf };

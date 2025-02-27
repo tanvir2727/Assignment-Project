@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../axios";
+import { toast } from 'react-toastify';
 
 const AllProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -24,11 +25,41 @@ const AllProjectList = () => {
     fetchProjects();
   }, []);
 
+  // Function to generate and download PDF
+  const handleGeneratePDF = async () => {
+    try {
+      // Make the GET request with proper configuration
+      const response = await axios.get('/auth/generate-pdf', {
+        withCredentials: true,
+        responseType: 'blob',  // Correctly placed in the config object
+      });
+  
+      // Create a link to trigger the download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Project_Report.pdf'); // Ensure file extension is added
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+  
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
+  
+
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">Project List</h2>
+
+      <button onClick={handleGeneratePDF} className="bg-blue-600 text-white px-4 py-2 rounded">Generate PDF</button>
+      <br />
+      <br />
       <div className="overflow-x-auto">
         <table className="projects-table w-full table-auto border-collapse">
           <thead>

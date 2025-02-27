@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import axios from '../axios'; // Import your configured axios instance
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer,toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css"; 
+import { toast } from 'react-toastify';
+
 
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  
-  
+
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -23,25 +23,32 @@ const SignIn = () => {
 
     try {
       // Send POST request to backend to log in the user
-      const response = await axios.post('/auth/signin', { email, password },{
+      const response = await axios.post('/auth/signin', { email, password }, {
         withCredentials: true,
       });
-
       // Save the access token to localStorage
       localStorage.setItem('accessToken', response.data.accessToken);
-      toast.success("Log In Successfully");
       // setMessage('Login successful!');
       setEmail('');
       setPassword('');
+      navigate('/profile');
+      toast.success("Log In Successfully", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
 
     } catch (error) {
       toast.error(error.response ? error.response.data.message : 'Server error');
     }
-
-    navigate('/profile');
   };
 
- 
+
 
 
   return (
@@ -68,13 +75,12 @@ const SignIn = () => {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-            onClick={() => toast.success('Signed in successfully!')}
+            onClick={handleSubmit}
           >
             Sign In
           </button>
         </form>
-        {/* Toast Container for notifications */}
-        <ToastContainer />
+
       </div>
     </div>
   );

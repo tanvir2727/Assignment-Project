@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ProjectsList from './ProjectsList';
 
 
+
 const Profile = () => {
   const [user, setUser] = useState({});
 
@@ -21,7 +22,6 @@ const Profile = () => {
          
       }
     };
-  
     fetchProfile();
   },[]);
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../axios';
 import CreateProject from './CreateProject';
+import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
 
@@ -14,7 +15,7 @@ const ProjectsList = () => {
  
     useEffect(() => {
       fetchProjects();
-  }, []);
+    }, []);
 
   const fetchProjects = async () => {
     try {
@@ -43,23 +44,38 @@ const handleProjectUpdated = () => {
 };
 
 const handleDelete = async (projectId) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    // Show SweetAlert2 confirmation dialog
+    const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    });
 
-    try {
-        await axios.delete(`/auth/projects/${projectId}`, { withCredentials: true });
-        toast.success("Project deleted successfully");
-        fetchProjects(); // Refresh project list
-    } catch (error) {
-        toast.error(error.response?.data?.message || "Error deleting project");
+    if (result.isConfirmed) {
+        try {
+            // Call the API to delete the project
+            await axios.delete(`/auth/projects/${projectId}`, { withCredentials: true });
+            
+            // Show success notification
+            toast.success("Delete Successfully")
+
+            // Refresh the project list
+            fetchProjects();
+        } catch (error) {
+            // Show error notification if deletion fails
+            Swal.fire({
+                title: "Error!",
+                text: error.response?.data?.message || "Error deleting project",
+                icon: "error"
+            });
+        }
     }
 };
  
-
-    // const history = Navigate();
-
-    // const handleEdit = (projectId) => {
-    //     history.push(`/projects/edit/${projectId}`);
-    // };
 
     if (loading) return <p>Loading projects...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -104,6 +120,7 @@ const handleDelete = async (projectId) => {
                                             >
                                                 Delete
                                         </button>
+                                        
                                   </td>
                               </tr>
                           ))}
@@ -112,6 +129,7 @@ const handleDelete = async (projectId) => {
               )}
           </>
       )}
+      
   </div>
     );
 };
