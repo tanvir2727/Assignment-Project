@@ -39,7 +39,7 @@ const signin = async (req, res) => {
           httpOnly: true, // Prevents client-side JavaScript access
           secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
         //   sameSite: 'Strict', // Prevents CSRF attacks
-          sameSite: "None", // Allows cross-origin requests
+          sameSite: "strict", // Allows cross-origin requests
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 
