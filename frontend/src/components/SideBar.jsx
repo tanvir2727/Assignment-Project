@@ -22,29 +22,29 @@ const SideBar = () => {
 
     const logoutUser = async () => {
         try {
-            // Perform logout
-            await axios.post("/auth/logout", {}, { withCredentials: true });
-            // const token =localStorage.removeItem('accessToken');
-            logout();
-            // Show success toast
-            toast.success("Logged out successfully!", {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-            });
-
-            // Redirect after successful logout 
-            navigate('/signin');
+          // Perform logout
+          await axios.post("/auth/logout", {}, { withCredentials: true });
+          // const token =localStorage.removeItem('accessToken');
+          logout();
+          // Show success toast
+          toast.success("Logged out successfully!", {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+    
+          // Redirect after successful logout 
+          navigate('/signin');
         } catch (error) {
-            toast.error("Error logging out");
-            console.error("Logout error:", error);
+          toast.error("Error logging out");
+          console.error("Logout error:", error);
         }
-    };
+      };
 
 
     return (
