@@ -23,7 +23,7 @@ function App() {
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
         <ToastContainer />
         <Header className="fixed top-0 left-0 w-full bg-white shadow-md z-50" />
-        <main className="container mx-auto p-4">
+        <main>
           <Routes>
             <Route path="/" element={<SignIn />} />
             <Route path="/signin" element={<SignIn />} />

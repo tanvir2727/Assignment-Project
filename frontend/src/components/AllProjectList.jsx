@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../axios";
 import { toast } from 'react-toastify';
+import SideBar from "./SideBar";
 
 const AllProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -54,7 +55,9 @@ const AllProjectList = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="min-h-screen flex bg-gray-100">
+      <SideBar></SideBar>
+      <div className='flex-1 p-6 '>
       <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">Project List</h2>
 
       <button onClick={handleGeneratePDF} className="bg-blue-600 text-white px-4 py-2 rounded">Generate PDF</button>
@@ -88,6 +91,7 @@ const AllProjectList = () => {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
 
   );

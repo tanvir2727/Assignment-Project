@@ -3,6 +3,7 @@ import axios from '../axios';
 import { toast } from 'react-toastify';
 
 import PropTypes from 'prop-types';
+import SideBar from './SideBar';
 
 
 const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
@@ -95,79 +96,89 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-          {projectToEdit ? 'Edit Project' : 'Create New Project'}
-        </h2>
+    <div className="min-h-screen flex bg-gray-100 ">
+      {!projectToEdit && <SideBar />}
+      
+      <div className="flex-1 p-6 flex items-center justify-center">
+        <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
+            {projectToEdit ? 'Edit Project' : 'Create New Project'}
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            value={project.name}
-            placeholder="Project Name"
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            name="introduction"
-            value={project.introduction}
-            placeholder="Introduction"
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select
-            name="status"
-            value={project.status}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="pending">Pending</option>
-            <option value="started">Started</option>
-            <option value="completed">Completed</option>
-          </select>
-          <input
-            type="datetime-local"
-            name="startDateTime"
-            value={project.startDateTime}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="datetime-local"
-            name="endDateTime"
-            value={project.endDateTime}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              name="name"
+              value={project.name}
+              placeholder="Project Name"
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
 
-          <h3 className="text-lg font-semibold text-gray-700 mt-4">Assign Users:</h3>
-          <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
-            <div className="space-y-2">
-              {users.map((user) => (
-                <label key={user.id} className="flex items-center space-x-2 text-gray-700">
-                  <input
-                    type="checkbox"
-                    onChange={() => handleUserSelection(user.id)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span>{user.name} ({user.email})</span>
-                </label>
-              ))}
+            <input
+              type="text"
+              name="introduction"
+              value={project.introduction}
+              placeholder="Introduction"
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <select
+              name="status"
+              value={project.status}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="pending">Pending</option>
+              <option value="started">Started</option>
+              <option value="completed">Completed</option>
+            </select>
+
+            <input
+              type="datetime-local"
+              name="startDateTime"
+              value={project.startDateTime}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              type="datetime-local"
+              name="endDateTime"
+              value={project.endDateTime}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <h3 className="text-lg font-semibold text-gray-700 mt-4">Assign Users:</h3>
+            <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
+              <div className="space-y-2">
+                {users.map((user) => (
+                  <label key={user.id} className="flex items-center space-x-2 text-gray-700">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleUserSelection(user.id)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span>{user.name} ({user.email})</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200">
-            {projectToEdit ? 'Update Project' : 'Create Project'}
-          </button>
-        </form>
-
-
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+            >
+              {projectToEdit ? 'Update Project' : 'Create Project'}
+            </button>
+          </form>
+        </div>
       </div>
 
     </div>
+
   );
 };
 

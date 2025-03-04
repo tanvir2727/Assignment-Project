@@ -2,7 +2,7 @@
 
 import axios from "../axios";
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from "../context/AuthContext";
 
@@ -11,9 +11,10 @@ const Header = () => {
 
   const navigate = useNavigate();
 
-  const {isAuthenticated,logout} = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const location = useLocation();
 
-  
+
   const logoutUser = async () => {
     try {
       // Perform logout
@@ -39,29 +40,35 @@ const Header = () => {
       console.error("Logout error:", error);
     }
   };
+
+  // Hide header on Sign In and Sign Up pages
+  if (location.pathname === "/signin" || location.pathname === "/signup") {
+    return null;
+  }
+
   return (
     <header className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-lg">
       <div className="text-2xl font-bold">
-        <h1>My App</h1> {/* You can replace this with a logo image if needed */}
+        <h1>My App</h1>
       </div>
       <nav>
         <ul className="flex space-x-6">
           {isAuthenticated ? (
             <>
               <li>
-                <Link to="/profile" className="nav-link hover:text-gray-300">Profile</Link>
+                <Link to="/profile" className="hover:text-gray-300">Profile</Link>
               </li>
               <li>
-                <div className="nav-link hover:text-gray-300 cursor-pointer" onClick={logoutUser}>Log Out</div>
+                <div className="hover:text-gray-300 cursor-pointer" onClick={logoutUser}>Log Out</div>
               </li>
             </>
           ) : (
             <>
               <li>
-                <Link to="/signup" className="nav-link hover:text-gray-300">Sign Up</Link>
+                <Link to="/signup" className="hover:text-gray-300">Sign Up</Link>
               </li>
               <li>
-                <Link to="/signin" className="nav-link hover:text-gray-300">Sign In</Link>
+                <Link to="/signin" className="hover:text-gray-300">Sign In</Link>
               </li>
             </>
           )}

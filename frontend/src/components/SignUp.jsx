@@ -1,14 +1,43 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Box, Grid, TextField, Button, createTheme, ThemeProvider } from "@mui/material";
+import Typography from '@mui/material/Typography';
+import {  Link,useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import axios from "../axios"; // Import your configured axios instance
+
+import imageSrc from "../assets/tree.png";
+
+const theme = createTheme();
+
+theme.typography.h3 = {
+  fontFamily: "'Roboto', sans-serif",
+  fontSize: '1rem',
+  '@media (min-width:600px)': {
+      fontSize: '1.5rem',
+  },
+  [theme.breakpoints.up('md')]: {
+      fontSize: '2rem',
+  },
+};
+
+theme.typography.p = {
+  fontFamily: "'Roboto', sans-serif",
+  fontSize: '0.5rem',
+  '@media (min-width:600px)': {
+      fontSize: '0.5rem',
+  },
+  [theme.breakpoints.up('md')]: {
+      fontSize: '1.5rem',
+  },
+};
+
 
 const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+
 
   const navigate = useNavigate();
 
@@ -16,66 +45,103 @@ const SignUp = () => {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      setMessage('All fields are required');
+     
       return;
     }
 
     try {
       // Send POST request to the backend to create the user
       const response = await axios.post('/auth/signup', { name, email, password });
-      setMessage('User registered successfully!');
+
       setName('');
       setEmail('');
       setPassword('');
       console.log(response);
       toast.success("Sign Up Successfully");
     } catch (error) {
-      setMessage(error.response ? error.response.data.message : 'Server error');
+        console.log(error);
+        
     }
     
     navigate('/signin');
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Sign Up</h2>
+    <Box>
+    <Grid
+        container
+        spacing={0} // Remove the spacing between items
+        justifyContent="center"
+        alignItems="stretch" // Stretch to full height
+        sx={{ height: "100vh", width: "100vw" }} // Full height and width of the screen
+    >
+        {/* Form Section */}
+        <Grid item xs={12} md={6} sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
 
-      {message && <p className="text-green-600 text-center mb-2">{message}</p>}
+            <Box mb={3} mr={7}>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-        >
-          Sign Up
-        </button>
-      </form>
-      
-    </div>
-    {/* <ToastContainer /> */}
-  </div>
+                <ThemeProvider theme={theme}>
+                    <Typography variant="p" sx={{ textAlign: "start" }}>Start Your Journey</Typography>
+                </ThemeProvider>
+
+                <ThemeProvider theme={theme}>
+                    <Typography variant="h3" sx={{ textAlign: "start" }}>Sign Up to InsideBox</Typography>
+                </ThemeProvider>
+
+            </Box>
+
+            <Box  component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2, width: "40%" }}>
+                <TextField
+                    id="name"
+                    label="Name"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    value={name}
+                    onChange={(e) => setName(e.target.value)} />
+                <TextField id="email" label="Email" variant="outlined" type="email" required fullWidth value={email} onChange={(e)=> setEmail(e.target.value)}/>
+                <TextField id="password" label="Password" variant="outlined" type="password" required fullWidth value={password} onChange={(e)=> setPassword(e.target.value)} />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ marginTop: 2, width: "100%", height: 48 }}
+                    type="submit"
+                    size="small"
+                >
+                    Sign up
+                </Button>
+            </Box>
+
+            <Box sx={{ position: "absolute", bottom: 0, left: 0, padding: 2, display: "flex", alignItems: "center" }}>
+                <Typography variant="body1" sx={{ fontFamily: "'Roboto', sans-serif", marginRight: 1 }}>
+                    Have An Account ?
+                </Typography>
+                <Typography
+                    component={Link}
+                    to="/signin"
+                    sx={{
+                        fontFamily: "'Roboto', sans-serif",
+                        color: "primary.main",
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" }
+                    }}
+                >
+                    Sign in
+                </Typography>
+            </Box>
+        </Grid>
+
+        {/* Image Section */}
+        <Grid item xs={12} md={6} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <img
+                src={imageSrc}
+                alt="Preview"
+                style={{ maxWidth: "100%", height: "100%", objectFit: "cover" }}
+            />
+        </Grid>
+    </Grid>
+</Box>
+
   );
 };
 
