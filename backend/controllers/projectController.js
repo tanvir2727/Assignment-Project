@@ -109,7 +109,17 @@ const getOwnerProjects = async (req, res) => {
         const ownerId = req.user.id; // Get user ID from authenticated request
 
         const query = 'SELECT * FROM projects WHERE ownerId = ?';
-        const [projects] = await db.promise().query(query, [ownerId]);
+        let [projects] = await db.promise().query(query, [ownerId]);
+        
+        const memberQuery = 'SELECT * FROM project_members';
+        const [memberAndProjectIds] = await db.promise().query(memberQuery);
+
+        projects = projects.map( project => {
+            return {
+                ...project,
+                memberIds: memberAndProjectIds.filter(memberAndProjectInfo => memberAndProjectInfo.projectId === project.id).map(memberAndProjectInfo => memberAndProjectInfo.userId)
+            }
+        })
 
         if (projects.length === 0) {
             return res.status(404).json({ message: 'No projects found' });

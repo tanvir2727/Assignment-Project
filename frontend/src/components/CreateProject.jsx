@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import axios from '../axios';
 import { toast } from 'react-toastify';
-
+import { Chip, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import PropTypes from 'prop-types';
 import SideBar from './SideBar';
 
 
 const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
   const [users, setUsers] = useState([]);
+  const [open, setOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [project, setProject] = useState({
     name: '',
     introduction: '',
     status: 'pending',
     startDateTime: '',
-    endDateTime: ''
+    endDateTime: '',
+    memberIds: []
   });
 
   CreateProject.propTypes = {
@@ -25,6 +27,7 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
       status: PropTypes.string,
       startDateTime: PropTypes.string,
       endDateTime: PropTypes.string,
+      memberIds: PropTypes.array
     }),
     onProjectUpdated: PropTypes.func
   };
@@ -37,8 +40,11 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
         introduction: projectToEdit.introduction || '',
         status: projectToEdit.status || '',
         startDateTime: projectToEdit.startDateTime ? projectToEdit.startDateTime.split('.')[0] : '',
-        endDateTime: projectToEdit.endDateTime ? projectToEdit.endDateTime.split('.')[0] : ''
+        endDateTime: projectToEdit.endDateTime ? projectToEdit.endDateTime.split('.')[0] : '',
+        memberIds: projectToEdit.memberIds || []
       });
+
+      setSelectedUsers(projectToEdit.memberIds || [])
     }
   }, [projectToEdit]);
 
@@ -95,10 +101,15 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
     }
   };
 
+   // Handle user removal from chips
+   const handleRemoveUser = (userId) => {
+    setSelectedUsers((prevSelected) => prevSelected.filter((id) => id !== userId));
+  };
+
   return (
     <div className="min-h-screen flex bg-gray-100 ">
       {!projectToEdit && <SideBar />}
-      
+
       <div className="flex-1 p-6 flex items-center justify-center">
         <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
@@ -151,21 +162,57 @@ const CreateProject = ({ projectToEdit, onProjectUpdated }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <h3 className="text-lg font-semibold text-gray-700 mt-4">Assign Users:</h3>
-            <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
-              <div className="space-y-2">
-                {users.map((user) => (
-                  <label key={user.id} className="flex items-center space-x-2 text-gray-700">
-                    <input
-                      type="checkbox"
-                      onChange={() => handleUserSelection(user.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mt-4">Assigned Users:</h3>
+
+              {/* Selected Users Chips */}
+              <Box mt={2} display="flex" flexWrap="wrap" gap={1}>
+                {selectedUsers.map((userId) => {
+                  const user = users.find((u) => u.id === userId);
+                  return user ? (
+                    <Chip
+                      key={user.id}
+                      label={`${user.name} (${user.email})`}
+                      onDelete={() => handleRemoveUser(user.id)}
+                      color="primary"
+                      variant="outlined"
                     />
-                    <span>{user.name} ({user.email})</span>
-                  </label>
-                ))}
-              </div>
+                  ) : null;
+                })}
+              </Box>
+
+              {/* Button to show user selection modal */}
+              <Box mt={2}>
+                <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+                  Assign Users
+                </Button>
+              </Box>
+
+              {/* Modal Dialog for user selection */}
+              <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Select Users</DialogTitle>
+                <DialogContent>
+                  <div className="max-h-60 overflow-y-auto">
+                    {users.map((user) => (
+                      <label key={user.id} className="flex items-center space-x-2 text-gray-700 my-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user.id)}
+                          onChange={() => handleUserSelection(user.id)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span>{user.name} ({user.email})</span>
+                      </label>
+                    ))}
+                  </div>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpen(false)} color="primary">Done</Button>
+                </DialogActions>
+              </Dialog>
             </div>
+
+
 
             <button
               type="submit"
